@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO.Ports;
-using System.Text;
+﻿using System.IO.Ports;
 
 using (var serial = new SerialPort("COM7", 19200, Parity.None, 8, StopBits.One))
 {
@@ -30,21 +28,32 @@ using (var serial = new SerialPort("COM7", 19200, Parity.None, 8, StopBits.One))
         var ppm5 = buffer[28] | buffer[27] << 8;
         var ppm10 = buffer[30] | buffer[29] << 8;
 
-        Console.Clear();
-        Console.WriteLine($"PM2.5: {pm25} ug/m3");
-        Console.WriteLine($"PM10: {pm10} ug/m3");
-        Console.WriteLine($"HCHO: {hcho} ug/m3");
-        Console.WriteLine($"TVOC: {tvoc} ug/m3");
-        Console.WriteLine($"CO2: {co2} ppm");
-        Console.WriteLine($"T: {temp / 100} °C");
-        Console.WriteLine($"H: {humidity / 100} %");
+        var check = buffer[37] | buffer[36] << 8;
+        var sum = buffer.Take(36).Sum(x => x);
 
-        Console.WriteLine($"PM0.3: {ppm03} ppm");
-        Console.WriteLine($"PM0.5: {ppm05} ppm");
-        Console.WriteLine($"PM1.0: {ppm1} ppm");
-        Console.WriteLine($"PM2.5: {ppm2} ppm");
-        Console.WriteLine($"PM5.0: {ppm5} ppm");
-        Console.WriteLine($"PM10: {ppm10} ppm");
+        if (check == sum && check != 0)
+        {
+            Console.Clear();
+
+            Console.WriteLine($"PM2.5: {pm25} ug/m3");
+            Console.WriteLine($"PM10: {pm10} ug/m3");
+            Console.WriteLine($"HCHO: {hcho} ug/m3");
+            Console.WriteLine($"TVOC: {tvoc} ug/m3");
+            Console.WriteLine($"CO2: {co2} ppm");
+            Console.WriteLine($"T: {temp / 100} °C");
+            Console.WriteLine($"H: {humidity / 100} %");
+
+            Console.WriteLine($"PM0.3: {ppm03} ppm");
+            Console.WriteLine($"PM0.5: {ppm05} ppm");
+            Console.WriteLine($"PM1.0: {ppm1} ppm");
+            Console.WriteLine($"PM2.5: {ppm2} ppm");
+            Console.WriteLine($"PM5.0: {ppm5} ppm");
+            Console.WriteLine($"PM10: {ppm10} ppm");
+        }
+        else
+        {
+            Console.WriteLine($"Reading data...");
+        }
     }
 }
 
